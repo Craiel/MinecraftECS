@@ -161,10 +161,6 @@ namespace Minecraft
                     mesh = Minecraft.GameSettings.GM.blockMesh,
                     material = Block
                 });
-
-                //add a box collider at the same location of the entity
-                Position posTemp = new Position { Value = (hitInfo.transform.position + hitInfo.normal) };
-                Minecraft.ColliderPool.CP.AddCollider(posTemp.Value);
             }
         }
 

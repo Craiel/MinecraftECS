@@ -73,7 +73,6 @@ namespace Minecraft
                     {
                         hightlevel = (int)(Heightmap.GetPixel(xBlock, zBlock).r * 100) - yBlock;
                         airChecker = false;
-                        Vector3 posTemp = new Vector3(xBlock, yBlock, zBlock);
 
                         switch (hightlevel)
                         {
