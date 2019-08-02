@@ -18,32 +18,26 @@ namespace Minecraft
         [Header("Nature Block Type")]
         public Material blockMaterial;
 
-        public EntityManager manager;
         public Entity entities;
         public GameObject Prefab_ref;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Initialize()
         {
-
-            EntityManager manager = World.Active.GetOrCreateManager<EntityManager>();
-
             // Create an archetype for basic blocks.
-            BlockArchetype = manager.CreateArchetype(
-                typeof(Position)
+            BlockArchetype = World.Active.EntityManager.CreateArchetype(
+                typeof(Translation)
             );
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         void Start()
         {
-            manager = World.Active.GetOrCreateManager<EntityManager>();
+            Entity entities = World.Active.EntityManager.CreateEntity(BlockArchetype);
+            World.Active.EntityManager.SetComponentData(entities, new Translation { Value = new int3(2, 0, 0) });
+            World.Active.EntityManager.AddComponentData(entities, new BlockTag { });
 
-            Entity entities = manager.CreateEntity(BlockArchetype);
-            manager.SetComponentData(entities, new Position { Value = new int3(2, 0, 0) });
-            manager.AddComponentData(entities, new BlockTag { });
-
-            manager.AddSharedComponentData(entities, new MeshInstanceRenderer
+            World.Active.EntityManager.AddSharedComponentData(entities, new RenderMesh
             {
                 mesh = blockMesh,
                 material = blockMaterial
@@ -54,9 +48,9 @@ namespace Minecraft
             if (Prefab_ref)
             {
                 NativeArray<Entity> entityArray = new NativeArray<Entity>(1, Allocator.Temp);
-                manager.Instantiate(Prefab_ref, entityArray);
+                World.Active.EntityManager.Instantiate(Prefab_ref, entityArray);
 
-                manager.SetComponentData(entityArray[0], new Position { Value = new float3(4, 0f, 0f) });
+                World.Active.EntityManager.SetComponentData(entityArray[0], new Translation { Value = new float3(4, 0f, 0f) });
                 entityArray.Dispose();
             }
         }

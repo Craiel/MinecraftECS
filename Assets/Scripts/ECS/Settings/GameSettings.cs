@@ -57,7 +57,6 @@ namespace Minecraft
                 GM = this;
         }
 
-        public EntityManager manager;
         public Entity entities;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -66,12 +65,11 @@ namespace Minecraft
             // This method creates archetypes for entities we will spawn frequently in this game.
             // Archetypes are optional but can speed up entity spawning substantially.
 
-            EntityManager manager = World.Active.GetOrCreateManager<EntityManager>();
 
             // Create an archetype for basic blocks.
-            BlockArchetype = manager.CreateArchetype(
+            BlockArchetype = World.Active.EntityManager.CreateArchetype(
                 //typeof(TransformMatrix),
-                typeof(Position)
+                typeof(Translation)
                 //typeof(ColliderChecker)
             );
             //typeof(MeshInstanceRenderer));
@@ -80,7 +78,6 @@ namespace Minecraft
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         void Start()
         {
-            manager = World.Active.GetOrCreateManager<EntityManager>();
             //entities = manager.CreateEntity(BlockArchetype);
             //Generate the world
             ChunkGenerator(ChunkBase);
@@ -171,11 +168,11 @@ namespace Minecraft
                             if (!maTemp)
                                 maTemp = pinkMaterial;
 
-                            Entity entities = manager.CreateEntity(BlockArchetype);
-                            manager.SetComponentData(entities, new Position { Value = new int3(xBlock, yBlock, zBlock) });
-                            manager.AddComponentData(entities, new BlockTag {});
+                            Entity entities = World.Active.EntityManager.CreateEntity(BlockArchetype);
+                            World.Active.EntityManager.SetComponentData(entities, new Translation { Value = new int3(xBlock, yBlock, zBlock) });
+                            World.Active.EntityManager.AddComponentData(entities, new BlockTag {});
 
-                            manager.AddSharedComponentData(entities, new MeshInstanceRenderer
+                            World.Active.EntityManager.AddSharedComponentData(entities, new RenderMesh
                             {
                                 mesh = meshTemp,
                                 material = maTemp
@@ -204,10 +201,10 @@ namespace Minecraft
                 if (!maTemp)
                     maTemp = pinkMaterial;
 
-                Entity entities = manager.CreateEntity(BlockArchetype);
-                manager.SetComponentData(entities, new Position { Value = new int3(xPos, i, zPos) });
-                manager.AddComponentData(entities, new BlockTag { });
-                manager.AddSharedComponentData(entities, new MeshInstanceRenderer
+                Entity entities = World.Active.EntityManager.CreateEntity(BlockArchetype);
+                World.Active.EntityManager.SetComponentData(entities, new Translation { Value = new int3(xPos, i, zPos) });
+                World.Active.EntityManager.AddComponentData(entities, new BlockTag { });
+                World.Active.EntityManager.AddSharedComponentData(entities, new RenderMesh
                 {
                     mesh = blockMesh,
                     material = maTemp
@@ -222,10 +219,10 @@ namespace Minecraft
                         {
                             if (k != zPos || j != xPos)
                             {
-                                entities = manager.CreateEntity(BlockArchetype);
-                                manager.SetComponentData(entities, new Position { Value = new int3(j, i, k) });
-                                manager.AddComponentData(entities, new BlockTag { });
-                                manager.AddSharedComponentData(entities, new MeshInstanceRenderer
+                                entities = World.Active.EntityManager.CreateEntity(BlockArchetype);
+                                World.Active.EntityManager.SetComponentData(entities, new Translation { Value = new int3(j, i, k) });
+                                World.Active.EntityManager.AddComponentData(entities, new BlockTag { });
+                                World.Active.EntityManager.AddSharedComponentData(entities, new RenderMesh
                                 {
                                     mesh = blockMesh,
                                     material = leavesMaterial
@@ -255,11 +252,11 @@ namespace Minecraft
                 maTemp = pinkMaterial;
 
             Quaternion rotation = Quaternion.Euler(0, 45, 0);
-            Entity entities = manager.CreateEntity(BlockArchetype);
-            manager.SetComponentData(entities, new Position { Value = new int3(xPos, yPos, zPos) });
-            manager.AddComponentData(entities, new Rotation { Value = rotation });
-            manager.AddComponentData(entities, new SurfacePlantTag { });
-            manager.AddSharedComponentData(entities, new MeshInstanceRenderer
+            Entity entities = World.Active.EntityManager.CreateEntity(BlockArchetype);
+            World.Active.EntityManager.SetComponentData(entities, new Translation { Value = new int3(xPos, yPos, zPos) });
+            World.Active.EntityManager.AddComponentData(entities, new Rotation { Value = rotation });
+            World.Active.EntityManager.AddComponentData(entities, new SurfacePlantTag { });
+            World.Active.EntityManager.AddSharedComponentData(entities, new RenderMesh
             {
                 mesh = tallGrassMesh,
                 material = maTemp
@@ -282,9 +279,9 @@ namespace Minecraft
             {
                 for (int j = 0; j < ranDice; j++)
                 {
-                    Entity entities = manager.CreateEntity(BlockArchetype);
-                    manager.SetComponentData(entities, new Position { Value = new int3(xPos+i, yPos + 15, zPos+j) });
-                    manager.AddSharedComponentData(entities, new MeshInstanceRenderer
+                    Entity entities = World.Active.EntityManager.CreateEntity(BlockArchetype);
+                    World.Active.EntityManager.SetComponentData(entities, new Translation { Value = new int3(xPos+i, yPos + 15, zPos+j) });
+                    World.Active.EntityManager.AddSharedComponentData(entities, new RenderMesh
                     {
                         mesh = meshTemp,
                         material = maTemp

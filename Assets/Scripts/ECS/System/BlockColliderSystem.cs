@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Entities;
+using Unity.Jobs;
 using Unity.Transforms;
 using UnityEngine;
 
@@ -9,7 +11,7 @@ namespace Minecraft
     /// This system creates a box collider for each block so the player can collide
     /// with them. This is a temporary workaround until ECS supports native physics.
     /// </summary>
-    class BlockColliderSystem : ComponentSystem
+    public sealed class BlockColliderSystem : JobComponentSystem
     {
         // System state components are persistent and not destroyed along with
         // entities so we can use them to track when a block is added or removed.
@@ -18,26 +20,56 @@ namespace Minecraft
             public int colliderIDs;
         }
 
-        struct AddedBlockGroup
+        [ExcludeComponent(typeof(BlockColliderData))]
+        private struct CreateColliderJob : IJobForEach<BlockTag>
         {
-            public EntityArray entities;
-            public ComponentDataArray<BlockTag> tag;
-            public ComponentDataArray<Position> positions;
-            public SubtractiveComponent<BlockColliderData> missing;
+            /*public void Execute(Entity entity, int index, ref BlockTag data)
+            {
+                Debug.Log("?");
+            }*/
+
+            public void Execute([ReadOnly] ref BlockTag c0)
+            {
+                Debug.Log("?");
+            }
         }
-        [Inject]
-        AddedBlockGroup addedBlocks;
+
+        protected override JobHandle OnUpdate(JobHandle inputDeps)
+        {
+            var job = new CreateColliderJob();
+            job.Schedule(this, inputDeps);
+//            DelayTickComponentJob job = new DelayTickComponentJob()
+//            {
+//                CommandBuffer = mEndFrameBarrier.CreateCommandBuffer().ToConcurrent(),
+//                DeltaTime = Time.deltaTime
+//            };
+//
+//            job.Run(this);
+            return inputDeps;
+        }
+
+        /*struct AddedBlockGroup
+        {
+            //public EntityArray entities;
+            public IJobForEach<BlockTag> tag;
+            public IJobForEach<Translation> positions;
+            public ExcludeComponent<BlockColliderData> missing;
+        }
+
+        //[Inject]
+        //AddedBlockGroup addedBlocks;
 
         struct RemovedBlockGroup
         {
-            public EntityArray entities;
-            public ComponentDataArray<BlockColliderData> colliderData;
-            public SubtractiveComponent<BlockTag> missing;
+            //public EntityArray entities;
+            public IJobForEach<BlockColliderData> colliderData;
+            public ExcludeComponent<BlockTag> missing;
         }
-        [Inject]
-        RemovedBlockGroup removedBlocks;
 
-        Dictionary<int, GameObject> colliders;
+        //[Inject]
+        //RemovedBlockGroup removedBlocks;
+
+        private IDictionary<int, GameObject> colliders;
 
         protected override void OnStartRunning()
         {
@@ -49,7 +81,7 @@ namespace Minecraft
             colliders = new Dictionary<int, GameObject>();
         }
 
-        protected override void OnUpdate()
+        protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
             // Process newly added blocks.
             for (int i = 0; i != addedBlocks.entities.Length; i++)
@@ -85,6 +117,8 @@ namespace Minecraft
 
                 PostUpdateCommands.RemoveComponent<BlockColliderData>(removedBlocks.entities[i]);
             }
-        }
+
+            return inputDeps;
+        }*/
     }
 }

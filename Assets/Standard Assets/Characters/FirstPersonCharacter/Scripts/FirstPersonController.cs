@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 using UnityStandardAssets.Utility;
 using Random = UnityEngine.Random;
-using Unity.Mathematics;
 
 namespace UnityStandardAssets.Characters.FirstPerson
 {
@@ -137,7 +136,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             //newCameraPosition.y = 1;
             //newCameraPosition.z = -2;
             //m_Camera.transform.localPosition = newCameraPosition;
-            
+
 
             m_MouseLook.UpdateCursorLock();
         }
@@ -212,7 +211,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void GetInput(out float speed)
         {
-        
+
 
             // Read input
             float horizontal = CrossPlatformInputManager.GetAxis("Horizontal");

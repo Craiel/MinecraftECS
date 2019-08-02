@@ -35,15 +35,11 @@ namespace Minecraft
 
         //bool stepAudioIsPlaying = false;
 
-        EntityManager manager;
-
         void Start()
         {
             AS = transform.GetComponent<AudioSource>();
             player = this.transform.parent.gameObject;
             Cursor.lockState = CursorLockMode.Locked;
-
-            manager = World.Active.GetOrCreateManager<EntityManager>();
         }
 
         void Update()
@@ -153,10 +149,10 @@ namespace Minecraft
                     AS.PlayOneShot(wood_audio);
                 }
 
-                Entity entities = manager.CreateEntity(Minecraft.GameSettings.BlockArchetype);
-                manager.SetComponentData(entities, new Position { Value = hitInfo.transform.position + hitInfo.normal });
-                manager.AddComponentData(entities, new BlockTag { });
-                manager.AddSharedComponentData(entities, new MeshInstanceRenderer
+                Entity entities = World.Active.EntityManager.CreateEntity(Minecraft.GameSettings.BlockArchetype);
+                World.Active.EntityManager.SetComponentData(entities, new Translation { Value = hitInfo.transform.position + hitInfo.normal });
+                World.Active.EntityManager.AddComponentData(entities, new BlockTag { });
+                World.Active.EntityManager.AddSharedComponentData(entities, new RenderMesh
                 {
                     mesh = Minecraft.GameSettings.GM.blockMesh,
                     material = Block
@@ -170,9 +166,9 @@ namespace Minecraft
             Physics.Raycast(transform.position, transform.forward, out hitInfo, 7, blockLayer);
             if (hitInfo.transform != null)
             {
-                Entity entities = manager.CreateEntity(Minecraft.GameSettings.BlockArchetype);
-                manager.SetComponentData(entities, new Position { Value = hitInfo.transform.position });
-                manager.AddComponentData(entities, new DestroyTag {});
+                Entity entities = World.Active.EntityManager.CreateEntity(Minecraft.GameSettings.BlockArchetype);
+                World.Active.EntityManager.SetComponentData(entities, new Translation { Value = hitInfo.transform.position });
+                World.Active.EntityManager.AddComponentData(entities, new DestroyTag {});
 
                 //move the dig effect to the position and play
                 if (digEffect && !digEffect.isPlaying)

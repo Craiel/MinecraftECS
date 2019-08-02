@@ -13,33 +13,34 @@ namespace Minecraft
         struct BlockGroup
         {
             [ReadOnly] public readonly int Length;
-            [ReadOnly] public EntityArray entity;
-            [ReadOnly] public ComponentDataArray<Position> positions;
-            [ReadOnly] public ComponentDataArray<BlockTag> tags;
+            //[ReadOnly] public EntityArray entity;
+            [ReadOnly] public IJobForEach<Translation> positions;
+            [ReadOnly] public IJobForEach<BlockTag> tags;
         }
 
         struct DestoryBlockGroup
         {
             [ReadOnly] public readonly int Length;
-            [ReadOnly] public EntityArray entity;
-            [ReadOnly]public ComponentDataArray<Position> positions;
-            [ReadOnly] public ComponentDataArray<DestroyTag> tags;
+            //[ReadOnly] public EntityArray entity;
+            [ReadOnly] public IJobForEach<Translation> positions;
+            [ReadOnly] public IJobForEach<DestroyTag> tags;
         }
 
         struct SurfacePlantGroup
         {
             [ReadOnly] public readonly int Length;
-            [ReadOnly] public EntityArray entity;
-            [ReadOnly] public ComponentDataArray<Position> positions;
-            [ReadOnly] public ComponentDataArray<SurfacePlantTag> tags;
+            //[ReadOnly] public EntityArray entity;
+            [ReadOnly] public IJobForEach<Translation> positions;
+            [ReadOnly] public IJobForEach<SurfacePlantTag> tags;
         }
-        [Inject] BlockGroup targetBlocks;
-        [Inject] DestoryBlockGroup sourceBlock;
-        [Inject] SurfacePlantGroup surfaceplants;
+
+        //[Inject] BlockGroup targetBlocks;
+        //[Inject] DestoryBlockGroup sourceBlock;
+        //[Inject] SurfacePlantGroup surfaceplants;
 
         protected override void OnUpdate()
         {
-            for (int i = 0; i < sourceBlock.Length; i++)
+            /*for (int i = 0; i < sourceBlock.Length; i++)
             {
                 for (int j = 0; j < targetBlocks.Length; j++)
                 {
@@ -67,7 +68,7 @@ namespace Minecraft
                         PostUpdateCommands.DestroyEntity(targetBlocks.entity[j]);
                     }
                 }
-            }
+            }*/
         }
     }
 }

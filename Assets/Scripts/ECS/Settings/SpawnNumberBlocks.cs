@@ -32,25 +32,20 @@ namespace Minecraft
 
         Material maTemp;
 
-        public EntityManager manager;
         public Entity entities;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Initialize()
         {
-
-            EntityManager manager = World.Active.GetOrCreateManager<EntityManager>();
-
             // Create an archetype for basic blocks.
-            BlockArchetype = manager.CreateArchetype(
-                typeof(Position)
+            BlockArchetype = World.Active.EntityManager.CreateArchetype(
+                typeof(Translation)
             );
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         void Start()
         {
-            manager = World.Active.GetOrCreateManager<EntityManager>();
             //Generate the world
             ChunkGenerator(ChunkBase);
         }
@@ -105,11 +100,11 @@ namespace Minecraft
 
                         if (!airChecker)
                         {
-                            Entity entities = manager.CreateEntity(BlockArchetype);
-                            manager.SetComponentData(entities, new Position { Value = new int3(xBlock, yBlock, zBlock) });
-                            manager.AddComponentData(entities, new BlockTag { });
+                            Entity entities = World.Active.EntityManager.CreateEntity(BlockArchetype);
+                            World.Active.EntityManager.SetComponentData(entities, new Translation { Value = new int3(xBlock, yBlock, zBlock) });
+                            World.Active.EntityManager.AddComponentData(entities, new BlockTag { });
 
-                            manager.AddSharedComponentData(entities, new MeshInstanceRenderer
+                            World.Active.EntityManager.AddSharedComponentData(entities, new RenderMesh
                             {
                                 mesh = blockMesh,
                                 material = maTemp
