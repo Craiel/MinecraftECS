@@ -7,8 +7,7 @@ namespace Minecraft.ECS
 {
     public class PerlinNoiseGenerator : MonoBehaviour
     {
-        public static int BlockFaces = 0;
-        public static Texture2D NoiseHeightMap;
+        public static float[][] NoiseHeightMap;
         int textureWidth = 200;
         int textureHeight = 200;
 
@@ -19,34 +18,29 @@ namespace Minecraft.ECS
         float offsetX;
         float offsetY;
 
-
         void Awake()
         {
 
             offsetX = Random.Range(0, 99999);
             offsetY = Random.Range(0, 99999);
 
-            Minecraft.GameSettings.Heightmap = GenerateHeightMap();
-            Minecraft.SpawnNumberBlocks.Heightmap = GenerateHeightMap();
-
-        }
-
-        Texture2D GenerateHeightMap()
-        {
-            Texture2D heightMap = new Texture2D(textureWidth, textureHeight);
-
-            for (int x = 0; x < textureWidth; x++)
+            NoiseHeightMap = new float[this.textureWidth][];
+            for (int x = 0; x < this.textureWidth; x++)
             {
-                for (int y = 0; y < textureHeight; y++)
+                NoiseHeightMap[x] = new float[this.textureHeight];
+                for (int y = 0; y < this.textureHeight; y++)
                 {
                     Color color = CalculateColor(x, y);
-                    heightMap.SetPixel(x, y, color);
+                    NoiseHeightMap[x][y] = color.r * 100f;
                 }
             }
-            heightMap.Apply();
-
-            return heightMap;
         }
+
+        public static float GetHeight(int x, int y)
+        {
+            return NoiseHeightMap[x][y];
+        }
+
         Color CalculateColor(int x, int y)
         {
             float xCoord1 = (float)x / textureWidth * scale1 + offsetX;

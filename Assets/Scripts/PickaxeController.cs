@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Enums;
 using UnityEngine;
 using Unity.Entities;
 using Unity.Rendering;
@@ -19,7 +20,7 @@ namespace Minecraft
         //public GameObject playerEntity;
         public static Transform BlockToDestroy;
 
-        Material BlockToPlace;
+        BlockType BlockToPlace;
 
         public static int blockID = 1;
 
@@ -71,42 +72,41 @@ namespace Minecraft
                 blockID--;
             }
 
-
             #region // blocklist
             if (blockID == 1)
             {
                 //stone
-                BlockToPlace = Minecraft.GameSettings.GM.stoneMaterial;
+                BlockToPlace = BlockType.Stone;
             }
             else if (blockID == 2)
             {
                 //plank
-                BlockToPlace = Minecraft.GameSettings.GM.plankMaterial;
+                BlockToPlace = BlockType.Plank;
             }
             else if (blockID == 3)
             {
                 //glass
-                BlockToPlace = Minecraft.GameSettings.GM.glassMaterial;
+                BlockToPlace = BlockType.Glass;
             }
             else if (blockID == 4)
             {
                 //wood
-                BlockToPlace = Minecraft.GameSettings.GM.woodMaterial;
+                BlockToPlace = BlockType.Wood;
             }
             else if (blockID == 5)
             {
                 //cobble
-                BlockToPlace = Minecraft.GameSettings.GM.cobbleMaterial;
+                BlockToPlace = BlockType.CobbleStone;
             }
             else if (blockID == 6)
             {
                 //TNT
-                BlockToPlace = Minecraft.GameSettings.GM.tntMaterial;
+                BlockToPlace = BlockType.TNT;
             }
             else if (blockID == 7)
             {
                 //brick
-                BlockToPlace = Minecraft.GameSettings.GM.brickMaterial;
+                BlockToPlace = BlockType.Brick;
             }
             #endregion
 
@@ -133,13 +133,11 @@ namespace Minecraft
             stepAudioIsPlaying = false;
         }*/
 
-        void PlaceBlock(Material Block)
+        void PlaceBlock(BlockType type)
         {
-            RaycastHit hitInfo;
-            Physics.Raycast(transform.position, transform.forward, out hitInfo, 7, blockLayer);
+            Physics.Raycast(transform.position, transform.forward, out var hitInfo, 7, blockLayer);
             if (hitInfo.transform != null)
             {
-
                 if (blockID == 1 || blockID == 3 || blockID == 5 || blockID == 7)
                 {
                     AS.PlayOneShot(stone_audio);
@@ -149,36 +147,44 @@ namespace Minecraft
                     AS.PlayOneShot(wood_audio);
                 }
 
-                Entity entities = World.Active.EntityManager.CreateEntity(Minecraft.GameSettings.BlockArchetype);
-                World.Active.EntityManager.SetComponentData(entities, new Translation { Value = hitInfo.transform.position + hitInfo.normal });
-                World.Active.EntityManager.AddComponentData(entities, new BlockTag { });
-                World.Active.EntityManager.AddSharedComponentData(entities, new RenderMesh
+                Vector3 blockPosition = hitInfo.transform.position + hitInfo.normal;
+                var data = new BlockCreateData
                 {
-                    mesh = Minecraft.GameSettings.GM.blockMesh,
-                    material = Block
-                });
+                    X = (int)blockPosition.x,
+                    Y = (int)blockPosition.y,
+                    Z = (int)blockPosition.z,
+                    BlockType = type
+                };
+
+                Entity entity = World.Active.EntityManager.CreateEntity(GameSettingsData.Instance.BlockCreateArchetype);
+                World.Active.EntityManager.SetComponentData(entity, data);
             }
         }
 
         void DestroyBlock()
         {
-            RaycastHit hitInfo;
-            Physics.Raycast(transform.position, transform.forward, out hitInfo, 7, blockLayer);
+            Physics.Raycast(transform.position, transform.forward, out var hitInfo, 7, blockLayer);
             if (hitInfo.transform != null)
             {
-                Entity entities = World.Active.EntityManager.CreateEntity(Minecraft.GameSettings.BlockArchetype);
-                World.Active.EntityManager.SetComponentData(entities, new Translation { Value = hitInfo.transform.position });
-                World.Active.EntityManager.AddComponentData(entities, new DestroyTag {});
-
+                Vector3 blockPosition = hitInfo.transform.position + hitInfo.normal;
                 //move the dig effect to the position and play
                 if (digEffect && !digEffect.isPlaying)
                 {
-                    digEffect.transform.position = hitInfo.transform.position;
+                    digEffect.transform.position = blockPosition;
                     digEffect.Play();
                 }
 
                 AS.PlayOneShot(dirt_audio);
-                Destroy(hitInfo.transform.gameObject);
+
+                var data = new BlockDestroyData
+                {
+                    X = (int) blockPosition.x,
+                    Y = (int) blockPosition.y,
+                    Z = (int) blockPosition.z
+                };
+
+                Entity entity = World.Active.EntityManager.CreateEntity(GameSettingsData.Instance.BlockDestroyArchetype);
+                World.Active.EntityManager.SetComponentData(entity, data);
             }
         }
     }

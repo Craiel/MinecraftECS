@@ -13,112 +13,88 @@ namespace Minecraft
     /// </summary>
     public sealed class BlockColliderSystem : JobComponentSystem
     {
-        // System state components are persistent and not destroyed along with
-        // entities so we can use them to track when a block is added or removed.
-        struct BlockColliderData : ISystemStateComponentData
-        {
-            public int colliderIDs;
-        }
+        private readonly IDictionary<int, GameObject> colliders;
 
-        [ExcludeComponent(typeof(BlockColliderData))]
-        private struct CreateColliderJob : IJobForEach<BlockTag>
+        public BlockColliderSystem()
         {
-            /*public void Execute(Entity entity, int index, ref BlockTag data)
-            {
-                Debug.Log("?");
-            }*/
-
-            public void Execute([ReadOnly] ref BlockTag c0)
-            {
-                Debug.Log("?");
-            }
+            this.colliders = new Dictionary<int, GameObject>();
         }
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var job = new CreateColliderJob();
-            job.Schedule(this, inputDeps);
-//            DelayTickComponentJob job = new DelayTickComponentJob()
-//            {
-//                CommandBuffer = mEndFrameBarrier.CreateCommandBuffer().ToConcurrent(),
-//                DeltaTime = Time.deltaTime
-//            };
-//
-//            job.Run(this);
+            this.CreateColliders();
+            this.DestroyColliders();
+
             return inputDeps;
         }
 
-        /*struct AddedBlockGroup
+        private void CreateColliders()
         {
-            //public EntityArray entities;
-            public IJobForEach<BlockTag> tag;
-            public IJobForEach<Translation> positions;
-            public ExcludeComponent<BlockColliderData> missing;
-        }
-
-        //[Inject]
-        //AddedBlockGroup addedBlocks;
-
-        struct RemovedBlockGroup
-        {
-            //public EntityArray entities;
-            public IJobForEach<BlockColliderData> colliderData;
-            public ExcludeComponent<BlockTag> missing;
-        }
-
-        //[Inject]
-        //RemovedBlockGroup removedBlocks;
-
-        private IDictionary<int, GameObject> colliders;
-
-        protected override void OnStartRunning()
-        {
-            if (!Application.isPlaying)
+            var queryDesc = new EntityQueryDesc
             {
+                All = new ComponentType[] {typeof(BlockCreateColliderTagData)},
+                None = new ComponentType[] {typeof(BlockColliderData)}
+            };
+
+            var query = GetEntityQuery(queryDesc);
+            NativeArray<Entity> data = query.ToEntityArray(Allocator.TempJob);
+
+            if (data.Length == 0)
+            {
+                data.Dispose();
                 return;
             }
 
-            colliders = new Dictionary<int, GameObject>();
+            foreach (Entity addedBlock in data)
+            {
+                Translation translation = EntityManager.GetComponentData<Translation>(addedBlock);
+                var obj = new GameObject("Block Collider") { layer = 9 };
+                obj.transform.position = translation.Value;
+                obj.AddComponent<BoxCollider>();
+                int instanceId = obj.GetInstanceID();
+                this.colliders.Add(instanceId, obj);
+
+                EntityManager.AddComponent<BlockColliderData>(addedBlock);
+                BlockColliderData colliderData = EntityManager.GetComponentData<BlockColliderData>(addedBlock);
+                colliderData.ColliderId = obj.GetInstanceID();
+                EntityManager.SetComponentData(addedBlock, colliderData);
+
+                EntityManager.RemoveComponent<BlockCreateColliderTagData>(addedBlock);
+            }
+
+            data.Dispose();
         }
 
-        protected override JobHandle OnUpdate(JobHandle inputDeps)
+        private void DestroyColliders()
         {
-            // Process newly added blocks.
-            for (int i = 0; i != addedBlocks.entities.Length; i++)
+            var queryDesc = new EntityQueryDesc
             {
-                // Create new collider object for this block.
-                var obj = new GameObject("Block Collider");
-                obj.layer = 9;
-                obj.transform.position = addedBlocks.positions[i].Value;
-                obj.AddComponent<BoxCollider>();
+                All = new ComponentType[] {typeof(BlockColliderData)},
+                None = new ComponentType[] {typeof(BlockData)}
+            };
 
-                // Add collider data to block entity so we can remove it later.
-                int id = obj.GetInstanceID();
-                var blockData = new BlockColliderData();
-                blockData.colliderIDs = id;
-                colliders.Add(id, obj);
+            var query = GetEntityQuery(queryDesc);
+            NativeArray<Entity> data = query.ToEntityArray(Allocator.TempJob);
 
-                PostUpdateCommands.AddComponent(addedBlocks.entities[i], blockData);
+            if (data.Length == 0)
+            {
+                data.Dispose();
+                return;
             }
 
-            // Process removed blocks.
-            for (int i = 0; i != removedBlocks.entities.Length; i++)
+            foreach (Entity removedBlock in data)
             {
-                int id = removedBlocks.colliderData[i].colliderIDs;
-
-                // Destroy collider object associated with this block.
-                GameObject obj;
-
-                if (colliders.TryGetValue(id, out obj))
+                var colliderData = World.Active.EntityManager.GetComponentData<BlockColliderData>(removedBlock);
+                if (this.colliders.TryGetValue(colliderData.ColliderId, out GameObject collider))
                 {
-                    colliders.Remove(id);
-                    GameObject.Destroy(obj);
+                    this.colliders.Remove(colliderData.ColliderId);
+                    Object.Destroy(collider);
                 }
 
-                PostUpdateCommands.RemoveComponent<BlockColliderData>(removedBlocks.entities[i]);
+                World.Active.EntityManager.RemoveComponent<BlockColliderData>(removedBlock);
             }
 
-            return inputDeps;
-        }*/
+            data.Dispose();
+        }
     }
 }
