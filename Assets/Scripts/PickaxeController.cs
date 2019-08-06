@@ -166,11 +166,12 @@ namespace Minecraft
             Physics.Raycast(transform.position, transform.forward, out var hitInfo, 7, blockLayer);
             if (hitInfo.transform != null)
             {
-                Vector3 blockPosition = hitInfo.transform.position + hitInfo.normal;
+                Vector3 blockPosition = hitInfo.transform.position;
+                
                 //move the dig effect to the position and play
                 if (digEffect && !digEffect.isPlaying)
                 {
-                    digEffect.transform.position = blockPosition;
+                    digEffect.transform.position = blockPosition + hitInfo.normal;
                     digEffect.Play();
                 }
 

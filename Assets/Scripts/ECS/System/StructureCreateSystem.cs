@@ -19,7 +19,6 @@ namespace Minecraft
 
         private struct CreateJob : IJobForEachWithEntity<StructureCreateData>
         {
-            public GameSettingsData Settings;
             public EntityCommandBuffer.Concurrent CommandBuffer;
 
             public void Execute(Entity entity, int index, [ReadOnly] ref StructureCreateData data)
@@ -40,7 +39,7 @@ namespace Minecraft
                                     continue;
                                 }
 
-                                Entity part = this.CommandBuffer.CreateEntity(index, this.Settings.BlockCreateArchetype);
+                                Entity part = this.CommandBuffer.CreateEntity(index, GameSettingsData.Instance.BlockCreateArchetype);
                                 var createData = new BlockCreateData
                                 {
                                     X = data.X + i,
@@ -60,7 +59,7 @@ namespace Minecraft
                     {
                         for (int i = data.Y; i < data.Y + 7; i++)
                         {
-                            Entity stem = this.CommandBuffer.CreateEntity(index, this.Settings.BlockCreateArchetype);
+                            Entity stem = this.CommandBuffer.CreateEntity(index, GameSettingsData.Instance.BlockCreateArchetype);
                             var stemData = new BlockCreateData
                             {
                                 X = data.X,
@@ -87,7 +86,7 @@ namespace Minecraft
                                                 continue;
                                             }
 
-                                            Entity canopy = this.CommandBuffer.CreateEntity(index, this.Settings.BlockCreateArchetype);
+                                            Entity canopy = this.CommandBuffer.CreateEntity(index, GameSettingsData.Instance.BlockCreateArchetype);
                                             var canopyData = new BlockCreateData
                                             {
                                                 X = j,
@@ -114,7 +113,6 @@ namespace Minecraft
         {
             var job = new CreateJob
             {
-                Settings = GameSettingsData.Instance,
                 CommandBuffer = this.entityCommandBufferSystem.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this, inputDeps);
 

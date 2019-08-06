@@ -5,30 +5,29 @@ using UnityEngine.UI;
 
 namespace Minecraft.ECS
 {
-    public class PerlinNoiseGenerator : MonoBehaviour
+    public static class PerlinNoiseGenerator
     {
         public static float[][] NoiseHeightMap;
-        int textureWidth = 200;
-        int textureHeight = 200;
+        static int textureWidth = 200;
+        static int textureHeight = 200;
 
-        float scale1 = 1f;
-        float scale2 = 10f;
-        float scale3 = 20f;
+        static float scale1 = 1f;
+        static float scale2 = 10f;
+        static float scale3 = 20f;
 
-        float offsetX;
-        float offsetY;
+        static float offsetX;
+        static float offsetY;
 
-        void Awake()
+        public static void Generate()
         {
-
             offsetX = Random.Range(0, 99999);
             offsetY = Random.Range(0, 99999);
 
-            NoiseHeightMap = new float[this.textureWidth][];
-            for (int x = 0; x < this.textureWidth; x++)
+            NoiseHeightMap = new float[textureWidth][];
+            for (int x = 0; x < textureWidth; x++)
             {
-                NoiseHeightMap[x] = new float[this.textureHeight];
-                for (int y = 0; y < this.textureHeight; y++)
+                NoiseHeightMap[x] = new float[textureHeight];
+                for (int y = 0; y < textureHeight; y++)
                 {
                     Color color = CalculateColor(x, y);
                     NoiseHeightMap[x][y] = color.r * 100f;
@@ -41,7 +40,7 @@ namespace Minecraft.ECS
             return NoiseHeightMap[x][y];
         }
 
-        Color CalculateColor(int x, int y)
+        private static Color CalculateColor(int x, int y)
         {
             float xCoord1 = (float)x / textureWidth * scale1 + offsetX;
             float yCoord1 = (float)y / textureHeight * scale1 + offsetY;

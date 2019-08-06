@@ -7,12 +7,10 @@ using UnityEngine;
 
 namespace Minecraft
 {
-    public class GameSettings : MonoBehaviour, IDeclareReferencedPrefabs, IConvertGameObjectToEntity
+    public class GameSettings : MonoBehaviour
     {
         [Header("World = ChunkBase x ChunkBase")]
         [SerializeField] public int ChunkBase = 1;
-
-        [SerializeField] public GameObject[] Blocks;
 
         [SerializeField]
         public bool CreateColliders = true;
@@ -21,42 +19,25 @@ namespace Minecraft
         public Mesh BlockMesh;
 
         [SerializeField]
-        public Material BlockMaterial;
+        public Mesh BlockMesh2;
 
-        public void DeclareReferencedPrefabs(List<GameObject> referencedPrefabs)
+        [SerializeField]
+        public Mesh FoliageMesh;
+
+        [SerializeField]
+        public Material[] BlockMaterials;
+
+        public void Awake()
         {
-            for (var i = 0; i < this.Blocks.Length; i++)
-            {
-                if (this.Blocks[i] != null)
-                {
-                    referencedPrefabs.Add(this.Blocks[i]);
-                }
-            }
-        }
-
-        public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
-        {
-            GameSettingsData.Mesh = this.BlockMesh;
-            GameSettingsData.Material = this.BlockMaterial;
-
             GameSettingsData.Instance = new GameSettingsData
             {
                 WorldChunkSize = this.ChunkBase,
                 CreateColliders = this.CreateColliders,
-                BlockStone = conversionSystem.GetPrimaryEntity(this.Blocks[(int)BlockType.Stone]),
-                BlockCobbleStone = conversionSystem.GetPrimaryEntity(this.Blocks[(int)BlockType.CobbleStone]),
-                BlockDirt = conversionSystem.GetPrimaryEntity(this.Blocks[(int)BlockType.Dirt]),
-                BlockDirtGrass = conversionSystem.GetPrimaryEntity(this.Blocks[(int)BlockType.DirtGrass]),
-                BlockPlank = conversionSystem.GetPrimaryEntity(this.Blocks[(int)BlockType.Plank]),
-                BlockGlass = conversionSystem.GetPrimaryEntity(this.Blocks[(int)BlockType.Glass]),
-                BlockWood = conversionSystem.GetPrimaryEntity(this.Blocks[(int)BlockType.Wood]),
-                BlockTNT = conversionSystem.GetPrimaryEntity(this.Blocks[(int)BlockType.TNT]),
-                BlockBrick = conversionSystem.GetPrimaryEntity(this.Blocks[(int)BlockType.Brick]),
-                BlockTallGrass = conversionSystem.GetPrimaryEntity(this.Blocks[(int)BlockType.TallGrass]),
-                BlockRose = conversionSystem.GetPrimaryEntity(this.Blocks[(int)BlockType.Rose]),
-                BlockCloud = conversionSystem.GetPrimaryEntity(this.Blocks[(int)BlockType.Cloud]),
-                BlockLeaves = conversionSystem.GetPrimaryEntity(this.Blocks[(int)BlockType.Leaves]),
-                BlockBedrock = conversionSystem.GetPrimaryEntity(this.Blocks[(int)BlockType.Bedrock]),
+                Initialized = true,
+                BlockMesh = this.BlockMesh,
+                BlockMesh2 = this.BlockMesh2,
+                FoliageMesh = this.FoliageMesh,
+                BlockMaterials = this.BlockMaterials,
                 BlockArchetype = World.Active.EntityManager.CreateArchetype(
                     typeof(Translation),
                     typeof(BlockData)
@@ -70,7 +51,7 @@ namespace Minecraft
                     typeof(StructureCreateData))
             };
 
-            dstManager.AddComponentData(entity, new GameInitData());
+            World.Active.EntityManager.CreateEntity(typeof(GameInitData));
         }
     }
 }

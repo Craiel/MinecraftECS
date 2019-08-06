@@ -15,7 +15,6 @@ namespace Minecraft
 
         private struct CreateJob : IJobForEachWithEntity<BlockDestroyData>
         {
-            public GameSettingsData Settings;
             public EntityCommandBuffer.Concurrent CommandBuffer;
 
             public void Execute(Entity entity, int index, [ReadOnly] ref BlockDestroyData data)
@@ -35,7 +34,6 @@ namespace Minecraft
         {
             var job = new CreateJob
             {
-                Settings = GameSettingsData.Instance,
                 CommandBuffer = this.entityCommandBufferSystem.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this, inputDeps);
 

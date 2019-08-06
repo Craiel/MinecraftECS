@@ -18,24 +18,24 @@ namespace Minecraft
 
         protected override void OnCreate()
         {
+            PerlinNoiseGenerator.Generate();
+            
             this.entityCommandBufferSystem = World.GetOrCreateSystem<BeginInitializationEntityCommandBufferSystem>();
         }
 
-        private struct GenerateJob : IJobForEachWithEntity<GameInitData, LocalToWorld>
+        private struct GenerateJob : IJobForEachWithEntity<GameInitData>
         {
-            public GameSettingsData Settings;
             public EntityCommandBuffer.Concurrent CommandBuffer;
 
-            public void Execute(Entity entity, int index, [ReadOnly] ref GameInitData init,
-                [ReadOnly] ref LocalToWorld location)
+            public void Execute(Entity entity, int index, [ReadOnly] ref GameInitData init)
             {
-                WorldData.Initialize(this.Settings.WorldChunkSize);
+                WorldData.Initialize(GameSettingsData.Instance.WorldChunkSize);
                 int count = 0;
                 for (int yBlock = 0; yBlock < Constants.ChunkHeight; yBlock++)
                 {
-                    for (int xBlock = 0; xBlock < Constants.ChunkWidth * this.Settings.WorldChunkSize; xBlock++)
+                    for (int xBlock = 0; xBlock < Constants.ChunkWidth * GameSettingsData.Instance.WorldChunkSize; xBlock++)
                     {
-                        for (int zBlock = 0; zBlock < Constants.ChunkLength * this.Settings.WorldChunkSize; zBlock++)
+                        for (int zBlock = 0; zBlock < Constants.ChunkLength * GameSettingsData.Instance.WorldChunkSize; zBlock++)
                         {
                             CreateType createType = CreateType.SolidBlock;
                             BlockType type = BlockType.Air;
@@ -153,9 +153,13 @@ namespace Minecraft
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
+            if (!GameSettingsData.Instance.Initialized)
+            {
+                return inputDeps;
+            }
+            
             var job = new GenerateJob
             {
-                Settings = GameSettingsData.Instance,
                 CommandBuffer = this.entityCommandBufferSystem.CreateCommandBuffer().ToConcurrent()
             }.Schedule(this, inputDeps);
 
