@@ -1,7 +1,4 @@
-using Enums;
-using Unity.Collections;
 using Unity.Entities;
-using Unity.Rendering;
 using UnityEngine;
 
 namespace Minecraft
@@ -21,14 +18,9 @@ namespace Minecraft
         public EntityArchetype BlockDestroyArchetype;
         public EntityArchetype StructureCreateArchetype;
 
-        public Mesh BlockMesh;
-        public Mesh BlockMesh2;
         public Mesh FoliageMesh;
-        public Material[] BlockMaterials;
 
-        public Material GetMaterial(BlockType type)
-        {
-            return BlockMaterials[(int)type];
-        }
+        public Material PackedMaterial;
+        public Material PackedMaterialTransparent;
     }
 }

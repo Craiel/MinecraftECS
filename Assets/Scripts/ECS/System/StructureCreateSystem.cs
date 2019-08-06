@@ -65,7 +65,7 @@ namespace Minecraft
                                 X = data.X,
                                 Y = i,
                                 Z = data.Z,
-                                BlockType = i == data.Y + 6 ? BlockType.Leaves : BlockType.Wood
+                                BlockType = i == data.Y + 6 ? BlockType.OakLeaves : BlockType.OakWood
                             };
 
                             this.CommandBuffer.SetComponent(index, stem, stemData);
@@ -92,7 +92,7 @@ namespace Minecraft
                                                 X = j,
                                                 Y = i,
                                                 Z = k,
-                                                BlockType = BlockType.Leaves
+                                                BlockType = BlockType.OakLeaves
                                             };
 
                                             this.CommandBuffer.SetComponent(index, canopy, canopyData);

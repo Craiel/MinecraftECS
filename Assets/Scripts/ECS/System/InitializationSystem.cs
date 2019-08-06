@@ -19,7 +19,7 @@ namespace Minecraft
         protected override void OnCreate()
         {
             PerlinNoiseGenerator.Generate();
-            
+
             this.entityCommandBufferSystem = World.GetOrCreateSystem<BeginInitializationEntityCommandBufferSystem>();
         }
 
@@ -77,7 +77,7 @@ namespace Minecraft
 
                                     if (surfaceRoll == 200)
                                     {
-                                        type = BlockType.Rose;
+                                        type = BlockType.Poppy;
                                         createType = CreateType.FoliageBlock;
                                     }
                                     else if (surfaceRoll == 199)
@@ -157,7 +157,7 @@ namespace Minecraft
             {
                 return inputDeps;
             }
-            
+
             var job = new GenerateJob
             {
                 CommandBuffer = this.entityCommandBufferSystem.CreateCommandBuffer().ToConcurrent()

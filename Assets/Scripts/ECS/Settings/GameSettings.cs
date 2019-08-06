@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using Enums;
-using Unity.Entities;
-using Unity.Rendering;
+﻿using Unity.Entities;
 using Unity.Transforms;
 using UnityEngine;
 
@@ -16,16 +13,13 @@ namespace Minecraft
         public bool CreateColliders = true;
 
         [SerializeField]
-        public Mesh BlockMesh;
-
-        [SerializeField]
-        public Mesh BlockMesh2;
-
-        [SerializeField]
         public Mesh FoliageMesh;
 
         [SerializeField]
-        public Material[] BlockMaterials;
+        public Material PackedMaterial;
+
+        [SerializeField]
+        public Material PackedMaterialTransparent;
 
         public void Awake()
         {
@@ -34,10 +28,9 @@ namespace Minecraft
                 WorldChunkSize = this.ChunkBase,
                 CreateColliders = this.CreateColliders,
                 Initialized = true,
-                BlockMesh = this.BlockMesh,
-                BlockMesh2 = this.BlockMesh2,
                 FoliageMesh = this.FoliageMesh,
-                BlockMaterials = this.BlockMaterials,
+                PackedMaterial = this.PackedMaterial,
+                PackedMaterialTransparent = this.PackedMaterialTransparent,
                 BlockArchetype = World.Active.EntityManager.CreateArchetype(
                     typeof(Translation),
                     typeof(BlockData)
@@ -50,6 +43,8 @@ namespace Minecraft
                 StructureCreateArchetype = World.Active.EntityManager.CreateArchetype(
                     typeof(StructureCreateData))
             };
+
+            BlockUtils.InitializeMeshes();
 
             World.Active.EntityManager.CreateEntity(typeof(GameInitData));
         }

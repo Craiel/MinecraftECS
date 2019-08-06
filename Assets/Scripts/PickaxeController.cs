@@ -81,7 +81,7 @@ namespace Minecraft
             else if (blockID == 2)
             {
                 //plank
-                BlockToPlace = BlockType.Plank;
+                BlockToPlace = BlockType.OakPlank;
             }
             else if (blockID == 3)
             {
@@ -91,7 +91,7 @@ namespace Minecraft
             else if (blockID == 4)
             {
                 //wood
-                BlockToPlace = BlockType.Wood;
+                BlockToPlace = BlockType.OakWood;
             }
             else if (blockID == 5)
             {
@@ -167,7 +167,7 @@ namespace Minecraft
             if (hitInfo.transform != null)
             {
                 Vector3 blockPosition = hitInfo.transform.position;
-                
+
                 //move the dig effect to the position and play
                 if (digEffect && !digEffect.isPlaying)
                 {
